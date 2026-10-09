@@ -1,4 +1,4 @@
-from ticket_creation import create_ticket
+from tickets import create_ticket
 
 
 print("tickect creation")
