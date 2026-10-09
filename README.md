@@ -121,3 +121,7 @@ Do not merge your own pull request without the required partner approval.
 ## Project Status
 
 **Status:** Initial repository setup. Application implementation and automated tests are pending.
+
+
+
+├── CONTRIBUTING.md
