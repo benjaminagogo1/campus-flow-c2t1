@@ -32,3 +32,6 @@ dist/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Application data
+data/tickets.json
