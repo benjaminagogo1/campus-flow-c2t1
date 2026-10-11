@@ -1,7 +1,8 @@
 from tickets import create_ticket
+from calcualate_prio import calculate_priority
 
 
-print("tickect creation")
+print(" ------ Welcome To Campus Workflow -----")
 categories = ["Network", "Hardware", "Software", "Other"]
 urgency = ["low", "medium", "high"]
 
@@ -29,6 +30,8 @@ while True:
            user_input4 = int(input("Enter affected users: "))
 
            
+          
+          
            if user_input4 <= 0:
               print("Please enter a positive number of users (greater than 0).")
               continue
@@ -36,9 +39,10 @@ while True:
             print("only numbers")
             continue  
 
-
-        user_input5 = input("Enter priority: ")   
+        calculated_prio = calculate_priority(user_input3.lower(), user_input4) 
         user_input6 = input("Enter status: ")
         user_input7 = input("Enter assigned: ")
 
-        create_ticket(user_input1, user_input2, user_input3, user_input4, user_input5, user_input6, user_input7)
+        create_ticket(user_input1, user_input2, user_input3, user_input4, calculated_prio, user_input6, user_input7)
+
+

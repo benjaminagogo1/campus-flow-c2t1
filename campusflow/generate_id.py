@@ -4,7 +4,7 @@ def generate_next_id(data_list, prefix="T"):
     
     existing_ids = []
     for item in data_list:
-        id_str = item.get("Id", "")
+        id_str = item.get("id", "")
         if id_str.startswith(prefix):
             num_part = int(id_str.replace(prefix, ""))
             existing_ids.append(num_part)
