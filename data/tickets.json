@@ -1,12 +1,12 @@
 [
     {
-        "Id": "T001",
-        "Title": "Campus WiFi is down",
-        "Category": "Network",
-        "Urgency": "high",
-        "Affected_Users": 15,
-        "Priority": "critical",
-        "Status": "open",
-        "Assisgned_to": "None"
+        "id": "T001",
+        "title": "Blocked Drainage",
+        "category": "other",
+        "urgency": "high",
+        "affected_users": 16,
+        "priority": "critical",
+        "status": "open",
+        "assigned_to": "none"
     }
 ]

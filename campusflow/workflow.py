@@ -1,70 +1,62 @@
-import json
+PRIORITY_RANK = {"critical": 0, "high": 1, "medium": 2, "low": 3}
+
+# open -> in_progress -> resolved, and resolved -> open is the explicit reopen.
+ALLOWED_TRANSITIONS = {
+    "open": {"in_progress"},
+    "in_progress": {"resolved"},
+    "resolved": {"open"},
+}
 
 
-def assign_ticket(ticket_id, staff_name, filename="campusflow/tickets.json"):
+def get_ticket(tickets, ticket_id):
+    wanted = str(ticket_id).strip().upper()
+    for ticket in tickets:
+        if str(ticket.get("id", "")).upper() == wanted:
+            return ticket
+    raise ValueError(f"Ticket '{ticket_id}' was not found.")
+
+
+def assign_ticket(tickets, ticket_id, staff_name):
     if not isinstance(staff_name, str) or not staff_name.strip():
         raise ValueError("Staff name cannot be empty.")
 
-    with open(filename, encoding="utf-8") as file:
-        tickets = json.load(file)
+    ticket = get_ticket(tickets, ticket_id)
 
-    for ticket in tickets:
-        if ticket.get("Id") == ticket_id:
-            ticket["Assigned_to"] = staff_name.strip()
-            with open(filename, "w", encoding="utf-8") as file:
-                json.dump(tickets, file, indent=4)
-            return ticket
+    if str(ticket.get("status", "open")).lower() == "resolved":
+        raise ValueError("Resolved tickets cannot be modified. Reopen the ticket first.")
 
-    raise ValueError(f"Ticket '{ticket_id}' was not found.")
+    ticket["assigned_to"] = staff_name.strip()
+    return ticket
 
 
-def update_status(ticket_id, new_status, filename="campusflow/tickets.json"):
-    allowed = {
-        "open": {"in_progress"},
-        "in_progress": {"resolved"},
-        "resolved": set(),
-    }
-    if new_status not in allowed:
-        raise ValueError("Invalid status.")
+def update_status(tickets, ticket_id, new_status):
+    new_status = str(new_status).strip().lower()
+    if new_status not in ALLOWED_TRANSITIONS:
+        raise ValueError("Invalid status. Choose open, in_progress or resolved.")
 
-    with open(filename, encoding="utf-8") as file:
-        tickets = json.load(file)
+    ticket = get_ticket(tickets, ticket_id)
+    current = str(ticket.get("status", "open")).lower()
 
-    for ticket in tickets:
-        if ticket.get("Id") == ticket_id:
-            current = ticket.get("Status", "open").lower()
+    if new_status not in ALLOWED_TRANSITIONS.get(current, set()):
+        raise ValueError(f"Cannot move ticket from {current} to {new_status}.")
 
-            if new_status not in allowed.get(current, set()):
-                raise ValueError(f"Cannot move ticket from {current} to {new_status}.")
+    if new_status == "in_progress" and not ticket.get("assigned_to"):
+        raise ValueError("Assign the ticket before starting work.")
 
-            if new_status == "in_progress" and not (
-                ticket.get("Assigned_to") or ticket.get("Assisgned_to")
-            ):
-                raise ValueError("Assign the ticket before starting work.")
-
-            ticket["Status"] = new_status
-            with open(filename, "w", encoding="utf-8") as file:
-                json.dump(tickets, file, indent=4)
-            return ticket
-
-    raise ValueError(f"Ticket '{ticket_id}' was not found.")
+    ticket["status"] = new_status
+    return ticket
 
 
-def get_work_queue(filename="campusflow/tickets.json"):
-    priority_rank = {"critical": 0, "high": 1, "medium": 2, "low": 3}
+def _queue_sort_key(ticket):
+    digits = "".join(char for char in str(ticket.get("id", "")) if char.isdigit())
+    priority = str(ticket.get("priority", "low")).lower()
+    return PRIORITY_RANK.get(priority, len(PRIORITY_RANK)), int(digits or 0)
 
-    with open(filename, encoding="utf-8") as file:
-        tickets = json.load(file)
 
-    queue = [
-        ticket for ticket in tickets
-        if ticket.get("Status", "open").lower() != "resolved"
+def get_work_queue(tickets):
+    unresolved = [
+        ticket
+        for ticket in tickets
+        if str(ticket.get("status", "open")).lower() != "resolved"
     ]
-
-    def sort_key(ticket):
-        ticket_id = str(ticket.get("Id", "T0"))
-        digits = "".join(char for char in ticket_id if char.isdigit())
-        priority = str(ticket.get("Priority", "low")).lower()
-        return priority_rank.get(priority, 4), int(digits or 0)
-
-    return sorted(queue, key=sort_key)
+    return sorted(unresolved, key=_queue_sort_key)
