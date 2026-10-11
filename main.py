@@ -22,7 +22,7 @@ while True:
           continue
 
         user_input3 = input("Enter urgency: ")
-        if user_input3.lower() not in [item.lower() for item in categories]:
+        if user_input3.lower() not in [item.lower() for item in urgency]:
             print("Invalid input. Please choose a valid category.")
             continue
         try:

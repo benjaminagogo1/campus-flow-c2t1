@@ -25,13 +25,10 @@ htmlcov/
 # Build and packaging artifacts
 build/
 dist/
-*.egg-info/
+
 
 # Editor and operating system files
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
-
-# Application data
-data/tickets.json
