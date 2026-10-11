@@ -50,6 +50,15 @@ Unresolved tickets are ordered by priority: critical, high, medium, then low. Ti
 ```text
 campus-flow-c2t1/
 ├── campusflow/
+|     ├──calculate_prio.py
+|     ├──generate_id.py
+|     ├──reports.py
+|     ├──storage.py
+|     ├──ticket_views.py
+|     ├──tickets.py
+|     └──workflow.py
+|
+|
 ├── docs/
 │   ├── ai-learning-log.md
 │   └── design-decisions.md

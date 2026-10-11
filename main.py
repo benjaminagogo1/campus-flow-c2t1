@@ -24,7 +24,7 @@ TICKET_FIELDS = [
 
 MENU = """
 ------ CampusFlow ------
-1. Create ticket
+\n1. Create ticket
 2. List all tickets
 3. View one ticket
 4. Assign ticket
@@ -135,12 +135,10 @@ def main():
     try:
         tickets = load_tickets()
     except StorageError as error:
-        # Stop here so we never overwrite a damaged file with an empty list.
         print(f"Cannot start: {error}")
         return
 
     print("------ Welcome to CampusFlow ------")
-    print(f"Loaded {len(tickets)} ticket(s).")
 
     while True:
         print(MENU)

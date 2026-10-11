@@ -53,6 +53,11 @@
 
 - **What I can now explain without AI:** How to iterate through a list of dictionaries, locate a record using a unique identifier, safely modify its fields, and handle cases where an ID cannot be found.
 
+
+
+
+
+
 ## Fellow: Kpensalen Thomas Aondongu - Engineer B: 
 ### Interaction #1 - Ticket Creation (Automated Ticket ID Generation)
 
@@ -92,6 +97,40 @@
 - **Related Files/Commits:** `main.py`
 
 - **What I Can Now Explain Without AI:** How to construct a sanitization layer for terminal inputs, how to enforce validation boundaries using iteration states, and how absolute namespace imports operate across custom packages.
+
+
+
+
+    
+## Fellow: Otete Benjamin Agogo - Engineer A:
+
+### Interaction #3 — Priority Engine Rule Ordering & Edge Case Validation
+
+- **Problem:** I needed to implement the exact priority calculation rules (Section 1.3) to ensure tickets are correctly classified as `critical`, `high`, `medium`, or `low` based on urgency and affected users in the specified order.
+
+
+- **My initial understanding:** I knew we needed sequential condition checks, but I wasn't sure how to structure the `if/elif` blocks so that overlapping conditions wouldn't trigger the wrong priority level.
+
+
+- **Prompt to AI:** "Provide a Python function snippet that calculates ticket priority based on urgency ('high', 'medium', 'low') and affected users (integer). Do not write my full application."
+
+
+- **Useful AI guidance:** AI provided a multi-branch `if/elif` structure, but it placed the check for `affected_users >= 10` *before* checking if the urgency was `high`. 
+
+- **My independent experiment/test:** I tested AI's proposed code logic against our project rules (Rule 1: high urgency AND 10+ affected users $\rightarrow$ critical). I discovered that checking affected users first caused a ticket with *low* urgency and 12 users to incorrectly trigger a higher priority tier than allowed by our rules.
+
+
+- **Verification source or result:** Compared the output against the sprint guide's exact specification table and realized the rule sequence was out of order.
+
+- **Decision:** **Rejected/Improved.** I rejected AI's initial condition ordering and manually restructured the `if/elif` block to strictly enforce the priority rules in the exact order required: Rule 1 (high urgency AND $\ge 10$ users), Rule 2 (high urgency OR $\ge 10$ users), Rule 3 (medium urgency OR $\ge 3$ users), and Rule 4 (remaining as low).
+
+
+- **Related file/commit:** `campusflow/tickets.py` & `tests/test_tickets.py`
+- **What I can now explain without AI:** How to sequence conditional logic carefully to match precise business rules, why strict rule ordering matters for ticket classification, and how to write unit tests to verify boundary conditions.
+
+
+
+
 
 
 
