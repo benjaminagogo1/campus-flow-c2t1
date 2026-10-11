@@ -1,40 +1,10 @@
 [
     {
         "id": "T001",
-        "title": "Campus Wi Fi is down",
-        "category": "Network",
-        "urgency": "high",
-        "affected_users": 12,
-        "priority": "critical",
-        "status": "open",
-        "assigned_to": "None"
-    },
-    {
-        "id": "T001",
-        "title": "Stagnant water",
-        "category": "other",
-        "urgency": "medium",
-        "affected_users": 3,
-        "priority": "medium",
-        "status": "open",
-        "assigned_to": "None"
-    },
-    {
-        "id": "T001",
-        "title": "BlockedDrainage",
-        "category": "other",
-        "urgency": "low",
-        "affected_users": 14,
-        "priority": "high",
-        "status": "open",
-        "assigned_to": "None"
-    },
-    {
-        "id": "T002",
-        "title": "Leaked roof",
+        "title": "Blocked Drainage",
         "category": "other",
         "urgency": "high",
-        "affected_users": 12,
+        "affected_users": 16,
         "priority": "critical",
         "status": "open",
         "assigned_to": "none"

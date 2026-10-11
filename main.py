@@ -1,5 +1,5 @@
-from tickets import create_ticket
-from calcualate_prio import calculate_priority
+from campusflow.tickets import create_ticket
+from campusflow.calcualate_prio import calculate_priority
 
 
 print(" ------ Welcome To Campus Workflow -----")

@@ -1,16 +1,15 @@
-from generate_id import generate_next_id
+from campusflow.generate_id import generate_next_id
 import json
 
 
 def create_ticket(title, category, urgency, affected_users, priority, status, assigned_to):
 
     try: 
-        with  open("tickets.json", "r") as file:
+        with  open("data/tickets.json", "r") as file:
             data = json.load(file)
 
-    except FileNotFoundError:
-
-            print("tickets.json not found")
+    except (FileNotFoundError, json.JSONDecodeError):
+            print("tickets.json not found or corrupted. Resetting file.")
             data = []
     new_id = generate_next_id(data, prefix="T")        
             
@@ -27,7 +26,7 @@ def create_ticket(title, category, urgency, affected_users, priority, status, as
 
     data.append(new_ticket_id)
 
-    with open("tickets.json", "w") as file:
+    with open("data/tickets.json", "w") as file:
           json.dump(data, file, indent=4)
           print(f"Successfully created ticket {new_id}")
 
