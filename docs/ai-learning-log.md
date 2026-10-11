@@ -1,4 +1,4 @@
-## Fellow: Otete Benjamin Agogo
+## Fellow: Otete Benjamin Agogo - Engineer A:
 
 ### Interaction #1 — GitHub Issues Creation & Structuring
 - **Problem:** I understood the high-level purpose of GitHub Issues for sprint planning, but I needed to learn the exact steps to create them and how to structure them properly with acceptance criteria.
@@ -24,7 +24,7 @@
 
 
 
-## Fellow: Otete Benjamin Agogo - Engineer B:
+## Fellow: Otete Benjamin Agogo - Engineer A:
 
 ### Interaction #2 — Ticket Assignment & Dictionary Updates
 
