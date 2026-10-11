@@ -1,6 +1,5 @@
 PRIORITY_RANK = {"critical": 0, "high": 1, "medium": 2, "low": 3}
 
-# open -> in_progress -> resolved, and resolved -> open is the explicit reopen.
 ALLOWED_TRANSITIONS = {
     "open": {"in_progress"},
     "in_progress": {"resolved"},
