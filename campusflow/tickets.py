@@ -11,20 +11,18 @@ def create_ticket(title, category, urgency, affected_users, priority, status, as
     except FileNotFoundError:
 
             print("tickets.json not found")
-            print("ticket.json is not found")
-
             data = []
     new_id = generate_next_id(data, prefix="T")        
             
     new_ticket_id = {
-        "Id": new_id,
-        "Title": title,
-        "Category": category,
-        "Urgency": urgency,
-        "Affected_Users": affected_users,
-        "Priority": priority,
-        "Status": status,
-        "Assisgned_to": assigned_to
+        "id": new_id,
+        "title": title,
+        "category": category,
+        "urgency": urgency,
+        "affected_users": affected_users,
+        "priority": priority,
+        "status": status,
+        "assigned_to": assigned_to
     }
 
     data.append(new_ticket_id)
