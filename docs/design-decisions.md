@@ -1,6 +1,15 @@
-## Input Validation Strategy:
-Team responsibilities have been formally distributed. We agreed that input validation will occur inline as data is received, rather than delegating checks to a separate standalone validation function, ensuring immediate feedback upon entry.
-Feature Ownership:
+## Input Validation Strategy (revised after trade-off discovery)
+
+Validation rules live in small functions in `campusflow/tickets.py`
+(validate_title, validate_category, validate_urgency, validate_affected_users)
+that raise ValueError. The CLI calls them as each value is typed, so the user
+still gets immediate feedback and re-enters only the field that failed.
+Reason: the rules can be unit-tested without interactive input, as the sprint
+guide requires.
+
+**What we found:** checks written inside the `input()` loop can't be tested
+by themselves. The sprint guide requires tests such as "zero affected users
+is rejected", so the rules needed to be functions we can call directly.
 
 ## OTETE BENJAMIN AGOGO - Engineer A:
 Responsible for ticket assignment, the status workflow lifecycle, work queues, and reporting (along with matching unit tests).
