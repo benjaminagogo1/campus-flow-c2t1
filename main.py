@@ -121,7 +121,7 @@ def handle_add_note(tickets):
         print("Error: Author and message fields cannot be empty.")
         return
 
-    ticket = add_note_ticket(ticket_id, author, message)
+    ticket = add_note_ticket(tickets, ticket_id, author, message)
     save_tickets(tickets)
     print(f"Successfully added note to Ticket {ticket_id}!")
 
