@@ -1,4 +1,5 @@
 from campusflow.reports import build_report, format_report
+from campusflow.create_note import add_note_ticket
 from campusflow.storage import StorageError, load_tickets, save_tickets
 from campusflow.tickets import (
     CATEGORIES,
@@ -29,8 +30,9 @@ MENU = """
 3. View one ticket
 4. Assign ticket
 5. Change status 
-6. Work queue
-7. Report
+6. Add note to ticket
+7. Work queue
+8. Report
 0. Exit"""
 
 
@@ -104,6 +106,26 @@ def handle_status(tickets):
     print(f"Ticket {ticket['id']} is now '{ticket['status']}'.")
 
 
+def handle_add_note(tickets):
+    ticket_id = read_ticket_id()
+    
+    ticket = find_ticket(tickets, ticket_id)
+    if ticket is None:
+        print(f"Error: Ticket '{ticket_id}' not found.")
+        return
+        
+    author = input("Enter your name (Author): ").strip()
+    message = input("Enter note message: ").strip()
+    
+    if not author or not message:
+        print("Error: Author and message fields cannot be empty.")
+        return
+
+    ticket = add_note_ticket(ticket_id, author, message)
+    save_tickets(tickets)
+    print(f"Successfully added note to Ticket {ticket_id}!")
+
+
 def handle_queue(tickets):
     queue = get_work_queue(tickets)
     if not queue:
@@ -126,8 +148,9 @@ ACTIONS = {
     "3": handle_view,
     "4": handle_assign,
     "5": handle_status,
-    "6": handle_queue,
-    "7": handle_report,
+    "6": handle_add_note,
+    "7": handle_queue,
+    "8": handle_report,
 }
 
 
