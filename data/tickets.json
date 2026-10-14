@@ -8,6 +8,12 @@
         "priority": "high",
         "status": "open",
         "assigned_to": null,
-        "notes": []
+        "notes": [
+            {
+                "note_id": "T001-N001",
+                "author": "Thomas",
+                "message": "Trynna fix it"
+            }
+        ]
     }
 ]
