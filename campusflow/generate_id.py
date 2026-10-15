@@ -1,14 +1,29 @@
-def generate_next_id(data_list, prefix="T"):
-    if not data_list:
-        return f"{prefix}001"
-    
-    existing_ids = []
+
+def get_number(id_text, prefix):
+    id_text = str(id_text).strip().upper()
+
+    if not id_text.startswith(prefix.upper()):
+        return None
+
+    digits = id_text[len(prefix):]   
+
+    if digits.isascii() and digits.isdigit():
+        return int(digits)
+    return None
+
+
+def generate_next_id(data_list, prefix="T", width=3):
+
+    highest = 0
     for item in data_list:
-        id_str = item.get("id", "")
-        if id_str.startswith(prefix):
-            num_part = int(id_str.replace(prefix, ""))
-            existing_ids.append(num_part)
-            
-    next_num = max(existing_ids) + 1 if existing_ids else 1
-    
-    return f"{prefix}{next_num:03d}"
+        if not isinstance(item, dict):
+            continue
+        number = get_number(item.get("id", ""), prefix)
+        if number is not None and number > highest:
+            highest = number
+    return f"{prefix}{highest + 1:0{width}d}"
+
+
+def next_ticket_id(tickets):
+    """Convenience wrapper: the next ticket ID for a list of tickets."""
+    return generate_next_id(tickets, prefix="T")

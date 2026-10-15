@@ -1,6 +1,12 @@
+import copy
 import unittest
 
-from campusflow.workflow import assign_ticket, get_work_queue, update_status
+from campusflow.workflow import (
+    assign_ticket,
+    can_transition,
+    get_work_queue,
+    update_status,
+)
 
 
 def make_ticket(ticket_id, priority="low", status="open", assigned_to=None):
@@ -41,6 +47,18 @@ class TestAssignTicket(unittest.TestCase):
             assign_ticket(tickets, "T001", "Bola")
         self.assertEqual(tickets[0]["assigned_to"], "Ada")
 
+    def test_rejected_assignment_leaves_whole_collection_unchanged(self):
+        tickets = [
+            make_ticket("T001", status="resolved", assigned_to="Ada"),
+            make_ticket("T002"),
+        ]
+        before = copy.deepcopy(tickets)
+        with self.assertRaises(ValueError):
+            assign_ticket(tickets, "T001", "Bola")
+        with self.assertRaises(ValueError):
+            assign_ticket(tickets, "T002", "   ")
+        self.assertEqual(tickets, before)
+
 
 class TestUpdateStatus(unittest.TestCase):
     def test_unassigned_ticket_cannot_start_work(self):
@@ -48,6 +66,13 @@ class TestUpdateStatus(unittest.TestCase):
         with self.assertRaises(ValueError):
             update_status(tickets, "T001", "in_progress")
         self.assertEqual(tickets[0]["status"], "open")
+
+    def test_unassigned_rejection_leaves_whole_collection_unchanged(self):
+        tickets = [make_ticket("T001"), make_ticket("T002", assigned_to="Ada")]
+        before = copy.deepcopy(tickets)
+        with self.assertRaises(ValueError):
+            update_status(tickets, "T001", "in_progress")
+        self.assertEqual(tickets, before)
 
     def test_assigned_ticket_progresses_to_resolved(self):
         tickets = [make_ticket("T001", assigned_to="Ada")]
@@ -100,6 +125,30 @@ class TestUpdateStatus(unittest.TestCase):
         self.assertEqual(tickets[0]["status"], "in_progress")
 
 
+class TestCanTransition(unittest.TestCase):
+    def test_unassigned_open_ticket_cannot_start(self):
+        self.assertFalse(can_transition(make_ticket("T001"), "in_progress"))
+
+    def test_assigned_open_ticket_can_start(self):
+        self.assertTrue(can_transition(make_ticket("T001", assigned_to="Ada"), "in_progress"))
+
+    def test_resolved_ticket_can_reopen(self):
+        ticket = make_ticket("T001", status="resolved", assigned_to="Ada")
+        self.assertTrue(can_transition(ticket, "open"))
+
+    def test_open_ticket_cannot_jump_to_resolved(self):
+        self.assertFalse(can_transition(make_ticket("T001", assigned_to="Ada"), "resolved"))
+
+    def test_invalid_status_is_false_not_an_exception(self):
+        self.assertFalse(can_transition(make_ticket("T001"), "banana"))
+
+    def test_can_transition_never_changes_the_ticket(self):
+        ticket = make_ticket("T001", assigned_to="Ada")
+        before = copy.deepcopy(ticket)
+        can_transition(ticket, "in_progress")
+        self.assertEqual(ticket, before)
+
+
 class TestGetWorkQueue(unittest.TestCase):
     def test_sorted_by_priority(self):
         tickets = [
@@ -133,9 +182,27 @@ class TestGetWorkQueue(unittest.TestCase):
         ids = [t["id"] for t in get_work_queue(tickets)]
         self.assertEqual(ids, ["T002"])
 
-    def test_in_progress_tickets_stay_in_queue(self):
-        tickets = [make_ticket("T001", "high", status="in_progress", assigned_to="Ada")]
-        self.assertEqual(len(get_work_queue(tickets)), 1)
+    def test_in_progress_tickets_are_excluded(self):
+        # The Open Work Queue shows OPEN tickets only.
+        tickets = [
+            make_ticket("T001", "high", status="in_progress", assigned_to="Ada"),
+            make_ticket("T002", "low"),
+        ]
+        ids = [t["id"] for t in get_work_queue(tickets)]
+        self.assertEqual(ids, ["T002"])
+
+    def test_queue_with_only_in_progress_and_resolved_is_empty(self):
+        tickets = [
+            make_ticket("T001", "high", status="in_progress", assigned_to="Ada"),
+            make_ticket("T002", "low", status="resolved", assigned_to="Ada"),
+        ]
+        self.assertEqual(get_work_queue(tickets), [])
+
+    def test_reopened_ticket_returns_to_the_queue(self):
+        tickets = [make_ticket("T001", "high", status="resolved", assigned_to="Ada")]
+        self.assertEqual(get_work_queue(tickets), [])
+        update_status(tickets, "T001", "open")
+        self.assertEqual([t["id"] for t in get_work_queue(tickets)], ["T001"])
 
     def test_empty_list_gives_empty_queue(self):
         self.assertEqual(get_work_queue([]), [])

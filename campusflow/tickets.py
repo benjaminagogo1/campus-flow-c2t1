@@ -1,47 +1,39 @@
-from campusflow.calcualate_prio import calculate_priority
+"""Ticket creation.
+
+The validators now live in campusflow.validation. They are re-exported here so
+existing imports such as `from campusflow.tickets import validate_title` keep
+working.
+"""
+
+from campusflow.calculate_prio import calculate_priority
 from campusflow.generate_id import generate_next_id
+from campusflow.validation import (
+    CATEGORIES,
+    URGENCIES,
+    validate_affected_users,
+    validate_category,
+    validate_title,
+    validate_urgency,
+)
 
-CATEGORIES = ["Network", "Hardware", "Software", "Other"]
-URGENCIES = ["low", "medium", "high"]
-
-
-def validate_title(title):
-    if not isinstance(title, str) or not title.strip():
-        raise ValueError("Title cannot be blank.")
-    return title.strip()
-
-
-def validate_category(category):
-    cleaned = str(category).strip().lower()
-    for allowed in CATEGORIES:
-        if allowed.lower() == cleaned:
-            return allowed
-    raise ValueError(f"Invalid category. Choose one of: {', '.join(CATEGORIES)}.")
-
-
-def validate_urgency(urgency):
-    cleaned = str(urgency).strip().lower()
-    if cleaned in URGENCIES:
-        return cleaned
-    raise ValueError(f"Invalid urgency. Choose one of: {', '.join(URGENCIES)}.")
-
-
-def validate_affected_users(value):
-    message = "Affected users must be a whole number greater than 0."
-    if isinstance(value, bool):
-        raise ValueError(message)
-    if isinstance(value, str):
-        text = value.strip()
-        if not text.isdigit():
-            raise ValueError(message)
-        value = int(text)
-    if not isinstance(value, int) or value <= 0:
-        raise ValueError(message)
-    return value
+__all__ = [
+    "CATEGORIES",
+    "URGENCIES",
+    "create_ticket",
+    "validate_affected_users",
+    "validate_category",
+    "validate_title",
+    "validate_urgency",
+]
 
 
 def create_ticket(tickets, title, category, urgency, affected_users):
-    # Validate everything first so a bad input never changes the list.
+    """Validate the inputs, then append and return a new ticket.
+
+    Contract: if ANY input is invalid a ValueError is raised and `tickets` is
+    left exactly as it was (validate before mutate). On success the ticket is
+    open, unassigned, has a calculated priority and an empty notes list.
+    """
     title = validate_title(title)
     category = validate_category(category)
     urgency = validate_urgency(urgency)
@@ -56,7 +48,7 @@ def create_ticket(tickets, title, category, urgency, affected_users):
         "priority": calculate_priority(urgency, affected_users),
         "status": "open",
         "assigned_to": None,
-        "note": []
+        "notes": [],
     }
     tickets.append(ticket)
     return ticket

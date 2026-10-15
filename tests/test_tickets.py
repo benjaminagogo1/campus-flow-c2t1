@@ -7,6 +7,7 @@ from campusflow.tickets import (
     validate_title,
     validate_urgency,
 )
+from campusflow.validation import validate_ticket
 
 
 class TestValidateTitle(unittest.TestCase):
@@ -71,6 +72,8 @@ class TestValidateAffectedUsers(unittest.TestCase):
     def test_boolean_rejected(self):
         with self.assertRaises(ValueError):
             validate_affected_users(True)
+        with self.assertRaises(ValueError):
+            validate_affected_users(False)
 
 
 class TestCreateTicket(unittest.TestCase):
@@ -88,6 +91,7 @@ class TestCreateTicket(unittest.TestCase):
                 "priority": "critical",
                 "status": "open",
                 "assigned_to": None,
+                "notes": [],
             },
         )
 
@@ -106,6 +110,21 @@ class TestCreateTicket(unittest.TestCase):
         self.assertEqual(ticket["status"], "open")
         self.assertIsNone(ticket["assigned_to"])
 
+    def test_new_ticket_starts_with_an_empty_notes_list(self):
+        ticket = create_ticket([], "Printer jam", "Other", "low", 1)
+        self.assertEqual(ticket["notes"], [])
+
+    def test_each_ticket_gets_its_own_notes_list(self):
+        tickets = []
+        first = create_ticket(tickets, "First", "Other", "low", 1)
+        second = create_ticket(tickets, "Second", "Other", "low", 1)
+        first["notes"].append({"note_id": "N001", "author": "A", "message": "hello"})
+        self.assertEqual(second["notes"], [])
+
+    def test_created_ticket_passes_strict_validation(self):
+        ticket = create_ticket([], "Wi-Fi down", "network", "HIGH", 15)
+        validate_ticket(ticket)  # raises ValueError if any invariant is broken
+
     def test_ids_are_sequential(self):
         tickets = []
         create_ticket(tickets, "First", "Other", "low", 1)
@@ -116,6 +135,11 @@ class TestCreateTicket(unittest.TestCase):
         tickets = [{"id": "T001"}, {"id": "T005"}]
         ticket = create_ticket(tickets, "Next", "Other", "low", 1)
         self.assertEqual(ticket["id"], "T006")
+
+    def test_id_generation_ignores_malformed_ids(self):
+        tickets = [{"id": "T003"}, {"id": "TEMP"}, {}, {"id": None}]
+        ticket = create_ticket(tickets, "Next", "Other", "low", 1)
+        self.assertEqual(ticket["id"], "T004")
 
     def test_invalid_input_does_not_change_ticket_list(self):
         tickets = []
